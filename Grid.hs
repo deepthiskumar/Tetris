@@ -4,6 +4,7 @@ import Prelude hiding (length, replicate, drop)
 import Types
 import Piece
 import Data.Sequence
+import Debug.Trace
 
 --Operations that can be performed on the layout
 -- and on the peice wrt the layout.
@@ -34,9 +35,21 @@ isValidPos :: Piece -> Grid -> Bool
 isValidPos p@(Piece s (x,y)) gr = noOverlap p gr
   
 noOverlap :: Piece -> Grid -> Bool
-noOverlap (Piece s (x,y)) gr = 
-  and [i >= 0 && j >= 0 && i < gridWidth && j < gridHeight && index (index gr j) i == E | i <- [x..x+3], j <- [y..y+3], 
-    index (index s (j-y)) (i-x) /= E   ]
+noOverlap (Piece s (x,y)) gr = trace ((show s) ++ (show $ length s - 1)) $ 
+  and [i >= 0 && j >= 0 && i < gridWidth && j < gridHeight && index (index gr j) i == E 
+    | i <- [x..(x+(length s)-1)], j <- [y..(y+(length s)-1)],index (index s (j-y)) (i-x) /= E]
+    
+_noOverlap :: Piece -> Grid -> Bool
+_noOverlap (Piece Empty _) _  = True
+_noOverlap (Piece s (x,y)) gr = noOverlap' x (index s 0) (index gr y)
+  && _noOverlap (Piece (drop 1 s) (x, y+1)) gr
+    where
+      noOverlap' :: Int -> Seq Cell -> Seq Cell -> Bool
+      noOverlap' x Empty _   = True
+      noOverlap' x pRow gRow 
+        | (index pRow 0) /= E = (index gRow x) == E 
+          && noOverlap' (x+1) (drop 1 pRow) gRow 
+        | otherwise = noOverlap' (x+1) (drop 1 pRow) gRow
 
 --4. update grid with the new piece
 updateGrid :: Piece -> Grid -> Grid

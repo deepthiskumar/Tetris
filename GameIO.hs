@@ -50,4 +50,4 @@ getUserMove = hReady stdin >>= f
   f False = return Nothing
 
 randPiece :: IO Piece
-randPiece = getStdRandom (randomR (0,27)) >>= return.newPiece 
+randPiece = getStdRandom (randomR (0,18)) >>= return.newPiece 

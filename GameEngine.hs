@@ -48,7 +48,7 @@ step = do
         True  -> return ()
         False -> do
           let (n, g'') = removeFilledRows (updateGrid p' g')
-          put (World g'' p' (s'+(n*10)) NewPiece 0)
+          put (World g'' p' (s'+(n*points)) NewPiece 0)
 
 completeUserMove :: Maybe Move -> GameState ()
 completeUserMove move = do

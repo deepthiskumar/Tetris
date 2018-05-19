@@ -51,6 +51,9 @@ type GameState a = StateT World IO a
 --Game Speed (multiple levels can be introduced but for now it's just one speed)
 speed = 15 :: Int
 
+--points for a full line
+points = 10 :: Int
+
 
 
 
