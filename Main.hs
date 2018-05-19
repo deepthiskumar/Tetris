@@ -1,2 +1,1 @@
-main = do
-  hsetBuffering stdin NoBuffering
+main = start

@@ -14,9 +14,9 @@ newGrid h w = replicate h (replicate w E)
 
 --2. Remove rows that do not have any empty cell
 --TODO check only the lines that coincide with the current piece's position
-removeFilledRows :: Grid -> Grid
+removeFilledRows :: Grid -> (Int, Grid)
 removeFilledRows gr = let (full, notFull) = partition isFull gr
-  in padEmptyRows (length full) notFull
+  in (length full, padEmptyRows (length full) notFull)
 
 padEmptyRows :: Int -> Grid -> Grid
 padEmptyRows n gr = (newGrid n gridWidth) >< gr
@@ -47,9 +47,10 @@ updateGrid (Piece s (x,y)) gr = let gr' = update y (updateRow x (index s 0) (ind
 
 updateRow :: Int -> Seq Cell -> Seq Cell -> Seq Cell
 updateRow _ Empty gRow = gRow
-updateRow x pRow gRow = let gRow' = update x (index pRow 0) gRow
-  in updateRow (x+1) (drop 1 pRow) gRow'
- 
+updateRow x pRow gRow 
+  | (index pRow 0) /= E = let gRow' = update x (index pRow 0) gRow
+                          in updateRow (x+1) (drop 1 pRow) gRow'
+  | otherwise           = updateRow (x+1) (drop 1 pRow) gRow
 
 
 

@@ -25,7 +25,7 @@ gridHeight = 20 :: Int
 gridWidth  = 20 :: Int
 
 --User operations
---1. Move left, right, down and rotate the piece
+--Move left, right, down and rotate the piece
 
 data Move = Le | Ri | Do | Ro
 
@@ -42,10 +42,14 @@ data World = World {
   grid :: Grid,
   currentPiece :: Piece,
   score :: Int,
-  gameStage :: GameStage }
+  gameStage :: GameStage,
+  timeCounter :: Int }
   deriving(Show)
   
 type GameState a = StateT World IO a
+
+--Game Speed (multiple levels can be introduced but for now it's just one speed)
+speed = 15 :: Int
 
 
 

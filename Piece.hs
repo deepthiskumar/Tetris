@@ -12,7 +12,7 @@ initPos = ((div gridWidth 2)-2, 0)
 
 pieceI :: Piece
 pieceI = Piece 
-  (fromList [fromList[E,I,E,E],fromList[E,I,E,E],fromList[E,I,E,E],fromList[E,I,E,E]])
+  (fromList [fromList[I,E,E,E],fromList[I,E,E,E],fromList[I,E,E,E],fromList[I,E,E,E]])
   initPos
   
 pieceJ :: Piece
@@ -65,6 +65,9 @@ moveRight (Piece s (x,y)) = Piece s (x+1,y)
 
 moveDown (Piece s (x,y)) = Piece s (x,y+1)
 
+newPiece :: Int -> Piece
+newPiece = index pieces
+
 ------------------------------------------------
 --helpers
 ------------------------------------------------
@@ -75,4 +78,8 @@ rotateSeq :: Seq (Seq a) -> Seq (Seq a)
 rotateSeq (Empty :<| xs) = empty
 rotateSeq s     = let s' = reverse s
   in (flatSeq $ fmap (take 1) s') <| (rotateSeq $ reverse $ mapWithIndex (\i x -> drop 1 x) s')
+  
+pieces :: Seq Piece
+pieces = let l = [pieceI, pieceJ, pieceL, pieceO, pieceS, pieceT, pieceZ]
+  in fromList $ l ++ (map rotate l) ++ (map rotateTwice l) ++ (map rotateThrice l)
 
