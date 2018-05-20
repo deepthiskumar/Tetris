@@ -1,7 +1,7 @@
 # Tetris
-Tetris implemented in Haskell
+Haskell implementation of Tetris
 
-##### Build, Install, and Run
+##### Build, Install and Run
 1. cabal configure
 2. cabal build
 3. cabal install
@@ -9,8 +9,10 @@ Tetris implemented in Haskell
 
 ##### Game Commands
 
-H -> Move left
-J -> Move Down
-L -> Move Right
-K -> Rotate (Clockwise)
+h : Move left
 
+j : Move Down
+
+l : Move Right
+
+k : Rotate (Clockwise)

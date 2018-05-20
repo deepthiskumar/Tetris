@@ -11,9 +11,10 @@ import Control.Concurrent
 
 
 start :: IO ()
-start = (hSetBuffering stdin NoBuffering) >> 
-  (hSetEcho stdin False) >> randPiece >>= e
-    where e p = evalStateT play (initWorld p) 
+start = do 
+  hSetBuffering stdin NoBuffering 
+  hSetEcho stdin False
+  randPiece >>= (\p -> evalStateT play (initWorld p)) 
 
 --the game loop
 play :: GameState ()
