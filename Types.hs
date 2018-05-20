@@ -3,8 +3,8 @@ module Types where
 import Data.Sequence
 import Control.Monad.Trans.State.Strict
 
---A piece in the game of tetris can be drawn on a 2D structure of the order 4x4
---A piece on the layout will consist of a position denoted by a x and y corodinates.
+--A piece in the game of tetris can be drawn on a 2D structure
+--A piece on the grid will consist of a position denoted by x and y corodinates.
 
 data Piece = Piece {
   struct :: Seq (Seq Cell),
@@ -12,11 +12,11 @@ data Piece = Piece {
   }
   deriving(Show, Eq)
 
---A cell can contain either of the following enum values. E refers to an empty cell
+--A cell can contain any of the following values. E refers to an empty cell
 data Cell = I | J | L | O | S | T | Z | E
   deriving(Show, Eq)
 
---A grid is again a 2D structure similar to a piece but of order height x width
+--A grid is again a 2D structure similar to a piece but of order gridHeight x gridWidth
 
 type Grid = Seq (Seq Cell)
 
@@ -49,14 +49,7 @@ data World = World {
 type GameState a = StateT World IO a
 
 --Game Speed (multiple levels can be introduced but for now it's just one speed)
-speed = 15 :: Int
+speed = 10 :: Int
 
 --points for a full line
 points = 10 :: Int
-
-
-
-
- 
-
-

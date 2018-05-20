@@ -1,7 +1,7 @@
 module GameIO where
 
 import Types
-import Data.Sequence hiding (replicate)
+import qualified Data.Sequence as S hiding (replicate)
 import Grid
 import Piece
 import System.Console.ANSI
@@ -9,9 +9,9 @@ import Control.Monad.IO.Class
 import Control.Monad.Trans.State.Strict
 import Control.Concurrent.Async
 import System.Random
-
 import System.IO
-import System.Console.Haskeline
+
+border = "*"
 
 printWorld :: GameState()
 printWorld = do
@@ -20,22 +20,23 @@ printWorld = do
 
 doIOStuff :: World -> IO ()
 doIOStuff w = do
-  --hSetBuffering stdin NoBuffering
   clearScreen >> setCursorPosition 0 0
   putStrLn $ showWorld w
 
 
 showWorld :: World -> String
 showWorld w = let g' = updateGrid (currentPiece w) (grid w)
-  in (concat $ fmap showRow g') ++ (replicate (gridWidth+2) '@') ++ "\nScore: " ++ show (score w)
+  in (concat $ fmap showRow g')
+    ++ (concat $ replicate (gridWidth+2) (border++" "))
+      ++ "\nScore: " ++ show (score w)
   
-showRow :: Seq Cell -> String
-showRow r = "@" ++ (concat $ fmap showCell r) ++ "@\n"
+showRow :: S.Seq Cell -> String
+showRow r = border ++ " " ++ (concat $ fmap showCell r) ++ border ++ "\n"
 
-showCell E = " "
-showCell x = show x
+showCell E = "  "
+showCell x = "O "
   
---data Move = Le | Ri | Do | Ro
+
 getUserMove :: IO (Maybe Move)
 getUserMove = hReady stdin >>= f
   where
@@ -50,4 +51,5 @@ getUserMove = hReady stdin >>= f
   f False = return Nothing
 
 randPiece :: IO Piece
-randPiece = getStdRandom (randomR (0,18)) >>= return.newPiece 
+randPiece = getStdRandom (randomR (0,S.length pieces -1))
+  >>= return.newPiece

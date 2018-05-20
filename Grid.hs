@@ -6,15 +6,14 @@ import Piece
 import Data.Sequence
 import Debug.Trace
 
---Operations that can be performed on the layout
--- and on the peice wrt the layout.
+--Operations that can be performed on the grid
+--and on the peice wrt the layout.
 
---1. construct the layout
+--1. construct a new grid
 newGrid :: Int -> Int -> Grid
 newGrid h w = replicate h (replicate w E)
 
 --2. Remove rows that do not have any empty cell
---TODO check only the lines that coincide with the current piece's position
 removeFilledRows :: Grid -> (Int, Grid)
 removeFilledRows gr = let (full, notFull) = partition isFull gr
   in (length full, padEmptyRows (length full) notFull)
@@ -35,26 +34,17 @@ isValidPos :: Piece -> Grid -> Bool
 isValidPos p@(Piece s (x,y)) gr = noOverlap p gr
   
 noOverlap :: Piece -> Grid -> Bool
-noOverlap (Piece s (x,y)) gr = trace ((show s) ++ (show $ length s - 1)) $ 
-  and [i >= 0 && j >= 0 && i < gridWidth && j < gridHeight && index (index gr j) i == E 
-    | i <- [x..(x+(length s)-1)], j <- [y..(y+(length s)-1)],index (index s (j-y)) (i-x) /= E]
-    
-_noOverlap :: Piece -> Grid -> Bool
-_noOverlap (Piece Empty _) _  = True
-_noOverlap (Piece s (x,y)) gr = noOverlap' x (index s 0) (index gr y)
-  && _noOverlap (Piece (drop 1 s) (x, y+1)) gr
-    where
-      noOverlap' :: Int -> Seq Cell -> Seq Cell -> Bool
-      noOverlap' x Empty _   = True
-      noOverlap' x pRow gRow 
-        | (index pRow 0) /= E = (index gRow x) == E 
-          && noOverlap' (x+1) (drop 1 pRow) gRow 
-        | otherwise = noOverlap' (x+1) (drop 1 pRow) gRow
+noOverlap (Piece s (x,y)) gr =  and [i >= 0 && j >= 0
+  && i < gridWidth && j < gridHeight && index (index gr j) i == E
+    | i <- [x..(x+(length s)-1)],
+      j <- [y..(y+(length s)-1)],
+      index (index s (j-y)) (i-x) /= E]
 
 --4. update grid with the new piece
 updateGrid :: Piece -> Grid -> Grid
 updateGrid (Piece Empty _) gr = gr
-updateGrid (Piece s (x,y)) gr = let gr' = update y (updateRow x (index s 0) (index gr y)) gr
+updateGrid (Piece s (x,y)) gr =
+  let gr' = update y (updateRow x (index s 0) (index gr y)) gr
   in updateGrid (Piece (drop 1 s) (x,y+1)) gr'
 
 
@@ -64,17 +54,3 @@ updateRow x pRow gRow
   | (index pRow 0) /= E = let gRow' = update x (index pRow 0) gRow
                           in updateRow (x+1) (drop 1 pRow) gRow'
   | otherwise           = updateRow (x+1) (drop 1 pRow) gRow
-
-
-
-
-
-
-
-
-
-
-
-
-
- 

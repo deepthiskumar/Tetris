@@ -31,47 +31,42 @@ step = do
   case gs of
     GameOver     -> return ()
     NewPiece     -> do
-      newPiece <- liftIO randPiece--TODO randPiece
+      newPiece <- liftIO randPiece
       case isValidPos newPiece g of
         True  -> put (World g newPiece s PieceFalling (t+1))
-        False -> put (World g p s GameOver (t+1))
+        False -> put (World g newPiece s GameOver (t+1))
     PieceFalling -> do
-      --timed fall
       liftIO $ (threadDelay (100000))
+      --timed fall
       if(t == speed) && (isValidPos (moveDown p) g) then
         put (World g (moveDown p) s PieceFalling 0)
-      else --put (World g p s gs (t+1))
-        liftIO getUserMove >>= completeUserMove
-      --lock the piece
-      w'@(World g' p' s' gs' t') <- get
-      case isValidPos (moveDown p') g' of
-        True  -> return ()
-        False -> do
-          let (n, g'') = removeFilledRows (updateGrid p' g')
-          put (World g'' p' (s'+(n*points)) NewPiece 0)
+      else
+        liftIO getUserMove >>= completeUserMove >> lockPiece
+
+
+lockPiece :: GameState ()
+lockPiece = do
+  w'@(World g' p' s' gs' t') <- get
+  case isValidPos (moveDown p') g' of
+    True  -> return ()
+    False -> do
+      let (n, g'') = removeFilledRows (updateGrid p' g')
+      put (World g'' p' (s'+(n*points)) NewPiece 0)
 
 completeUserMove :: Maybe Move -> GameState ()
 completeUserMove move = do
   w@(World g p s gs t) <- get
   case move of
-        Just Ro ->  do
-                     if isValidPos (rotate p) g then
-                       put (World g (rotate p) s PieceFalling (t+1))
-                     else put (World g p s gs (t+1))
-        Just Do ->  do
-                     if isValidPos (moveDown p) g then 
-                       put (World g (moveDown p) s PieceFalling (t+1))
-                     else put (World g p s gs (t+1))
-        Just Le ->  do
-                     if isValidPos (moveLeft p) g then 
-                       put (World g (moveLeft p) s PieceFalling (t+1))
-                     else put (World g p s gs (t+1))
-        Just Ri ->  do
-                     if isValidPos (moveRight p) g then 
-                       put (World g (moveRight p) s PieceFalling (t+1))
-                     else put (World g p s gs (t+1))
+        Just Ro ->  put $ userMove rotate w
+        Just Do ->  put $ userMove moveDown w
+        Just Le ->  put $ userMove moveLeft w
+        Just Ri ->  put $ userMove moveRight w
         Nothing ->  put (World g p s gs (t+1))
 
+userMove :: (Piece -> Piece) -> World -> World
+userMove f (World g p s gs t)
+  | isValidPos (f p) g = (World g (f p) s PieceFalling (t+1))
+  | otherwise          = (World g p s gs (t+1))
 
 initWorld :: Piece -> World
 initWorld p = World (newGrid gridHeight gridWidth) p 0 PieceFalling 0
